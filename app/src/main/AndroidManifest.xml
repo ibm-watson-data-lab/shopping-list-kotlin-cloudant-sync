@@ -24,6 +24,8 @@
                 android:label="@string/title_activity_shopping_list_add"
                 android:theme="@style/AppTheme.NoActionBar">
         </activity>
+        <activity android:name=".ShoppingListManageActivity">
+        </activity>
     </application>
 
 </manifest>

@@ -1,11 +1,11 @@
 package com.ibm.shoppinglist
 
-import com.cloudant.sync.documentstore.DocumentStore
+import com.ibm.shoppinglist.model.ShoppingListRepository
 
 class StateManager {
 
     companion object{
 
-        lateinit var ds: DocumentStore
+        lateinit var shoppingListRepository: ShoppingListRepository
     }
 }

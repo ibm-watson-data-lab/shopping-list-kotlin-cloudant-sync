@@ -10,10 +10,9 @@ import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
-import com.ibm.shoppinglist.model.ShoppingListsRecyclerViewAdapter
-import com.cloudant.sync.documentstore.DocumentStoreException
-import com.cloudant.sync.documentstore.DocumentRevision
+import com.ibm.shoppinglist.view.ShoppingListsRecyclerViewAdapter
 import com.cloudant.sync.documentstore.DocumentStore
+import com.ibm.shoppinglist.model.ShoppingListRepository
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
@@ -27,44 +26,27 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         // Initialize the database
-        val path = applicationContext.getDir("documentstores", Context.MODE_PRIVATE)
-        try {
-            StateManager.ds = DocumentStore.getInstance(File(path, "shopping-list"))
-        } catch (dse: DocumentStoreException) {
-            // TODO:???
-            System.err.println("Problem opening or accessing DocumentStore: " + dse)
-        }
+        val documentStorePath = applicationContext.getDir("documentstores", Context.MODE_PRIVATE)
+        val documentStore = DocumentStore.getInstance(File(documentStorePath, "shopping-list"))
+        StateManager.shoppingListRepository = ShoppingListRepository(documentStore)
 
         // Load the shopping lists
-        val recyclerView = findViewById(R.id.shopping_lists_recycler_view) as RecyclerView
-        val layoutManager = LinearLayoutManager(this)
-        this.shoppingListsAdapter = ShoppingListsRecyclerViewAdapter(this.loadShoppingLists())
-        recyclerView.adapter = this.shoppingListsAdapter
-        recyclerView.layoutManager = layoutManager
+        this.shoppingListsAdapter = ShoppingListsRecyclerViewAdapter(this, StateManager.shoppingListRepository.find())
 
+        // Initialize RecyclerView
+        val recyclerView = findViewById(R.id.shopping_lists_recycler_view) as RecyclerView
+        recyclerView.adapter = this.shoppingListsAdapter
+        recyclerView.layoutManager = LinearLayoutManager(this)
+
+        //
         val fab = findViewById(R.id.fab) as FloatingActionButton
         fab.setOnClickListener { _ -> startActivity(Intent(this, ShoppingListAddActivity::class.java)) }
-
-
     }
 
-    private fun loadShoppingLists() : List<DocumentRevision> {
-        val shoppingLists = ArrayList<DocumentRevision>()
-        try {
-            val query = HashMap<String, Any>()
-            query.put("type", "list")
-            val result = StateManager.ds.query().find(query)
-            shoppingLists += result
-        } catch (dse: DocumentStoreException) {
-            // TODO:???
-            System.err.println("Problem opening or accessing DocumentStore: " + dse)
-        }
-        return shoppingLists
-    }
 
     public override fun onResume() {  // After a pause OR at startup
         super.onResume()
-        this.shoppingListsAdapter.updateShoppingLists(this.loadShoppingLists())
+        this.shoppingListsAdapter.updateShoppingLists()
 
     }
 

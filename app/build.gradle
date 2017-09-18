@@ -26,12 +26,12 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    compile group: 'com.cloudant', name: 'cloudant-sync-datastore-android-encryption', version: 'latest.release'
     compile 'com.android.support:appcompat-v7:26.+'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.android.support:design:26.+'
     compile 'com.android.support:cardview-v7:26.+'
     compile 'com.android.support:recyclerview-v7:26.+'
-    compile group: 'com.cloudant', name: 'cloudant-sync-datastore-android-encryption', version:'latest.release'
     testCompile 'junit:junit:4.12'
 }
 repositories {

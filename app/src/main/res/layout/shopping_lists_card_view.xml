@@ -9,9 +9,24 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         card_view:cardCornerRadius="4dp">
-    <TextView
-            android:text="TextView"
-            android:padding="10dp"
+    <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:id="@+id/shopping_lists_card_text_view"/>
+            android:layout_height="match_parent"
+            android:orientation="vertical" >
+        <android.support.v7.widget.Toolbar
+                android:id="@+id/shopping_lists_card_toolbar"
+                android:layout_width="match_parent"
+                android:background="?attr/colorBackgroundFloating" android:layout_height="?attr/actionBarSize"/>
+        <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/darker_gray" />
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:text="x of y items checked"
+                android:textSize="16sp" />
+    </LinearLayout>
 </android.support.v7.widget.CardView>
