@@ -8,7 +8,7 @@ import com.ibm.shoppinglist.view.ShoppingListRecyclerViewAdapter
 
 class ShoppingListManageActivity : AppCompatActivity() {
 
-    lateinit var shoppingListAdapter : ShoppingListRecyclerViewAdapter
+    private lateinit var shoppingListAdapter : ShoppingListRecyclerViewAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,5 +21,10 @@ class ShoppingListManageActivity : AppCompatActivity() {
         val recyclerView = findViewById(R.id.shopping_list_recycler_view) as RecyclerView
         recyclerView.adapter = this.shoppingListAdapter
         recyclerView.layoutManager = LinearLayoutManager(this)
+    }
+
+    public override fun onResume() {
+        super.onResume()
+        this.shoppingListAdapter.updateShoppingItemList()
     }
 }

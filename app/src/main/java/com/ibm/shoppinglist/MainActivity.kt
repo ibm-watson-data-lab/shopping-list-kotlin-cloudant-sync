@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity() {
         StateManager.shoppingListRepository = ShoppingListRepository(documentStore)
 
         // Load the shopping lists
-        this.shoppingListsAdapter = ShoppingListsRecyclerViewAdapter(this, StateManager.shoppingListRepository.find())
+        this.shoppingListsAdapter = ShoppingListsRecyclerViewAdapter(StateManager.shoppingListRepository.find())
 
         // Initialize RecyclerView
         val recyclerView = findViewById(R.id.shopping_lists_recycler_view) as RecyclerView
@@ -47,7 +47,6 @@ class MainActivity : AppCompatActivity() {
     public override fun onResume() {  // After a pause OR at startup
         super.onResume()
         this.shoppingListsAdapter.updateShoppingLists()
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

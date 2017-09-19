@@ -2,21 +2,28 @@
 <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="20dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp">
+        android:layout_margin="0dp">
     <CheckBox
             android:id="@+id/shopping_list_card_check_box"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_margin="10dp"/>
+    <EditText
+            android:id="@+id/shopping_list_card_edit_text"
+            android:layout_width="302dp"
+            android:layout_height="match_parent"
+            android:inputType="text"
+            android:textSize="16sp"
+            android:lines="1"
+            android:maxLines="1"
+            android:layout_marginTop="15dp"/>
     <TextView
             android:id="@+id/shopping_list_card_text_view"
             android:layout_width="302dp"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:text="x of y items checked"
-            android:textSize="16sp"/>
+            android:layout_height="match_parent"
+            android:inputType="text"
+            android:textSize="16sp"
+            android:layout_marginTop="15dp"/>
 </LinearLayout>

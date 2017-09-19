@@ -2,6 +2,9 @@ package com.ibm.shoppinglist.model
 
 import com.cloudant.sync.documentstore.DocumentRevision
 import com.cloudant.sync.documentstore.DocumentStore
+import com.cloudant.sync.documentstore.DocumentBodyFactory
+
+
 
 class ShoppingListRepository(private val ds: DocumentStore) {
 
@@ -35,6 +38,15 @@ class ShoppingListRepository(private val ds: DocumentStore) {
         }
         else {
             this.ds.database().update(shoppingList)
+        }
+    }
+
+    fun putItem(shoppingListItem: DocumentRevision) : DocumentRevision {
+        return if (shoppingListItem.revision == null) {
+            this.ds.database().create(shoppingListItem)
+        }
+        else {
+            this.ds.database().update(shoppingListItem)
         }
     }
 

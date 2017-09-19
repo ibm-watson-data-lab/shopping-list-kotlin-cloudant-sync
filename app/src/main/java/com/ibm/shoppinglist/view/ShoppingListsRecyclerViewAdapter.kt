@@ -1,6 +1,6 @@
 package com.ibm.shoppinglist.view
 
-import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
@@ -12,10 +12,11 @@ import com.ibm.shoppinglist.R
 import com.ibm.shoppinglist.ShoppingListManageActivity
 import com.ibm.shoppinglist.StateManager
 
-class ShoppingListsRecyclerViewAdapter(private val activity: Activity, private var shoppingLists: List<DocumentRevision>) : RecyclerView.Adapter<ShoppingListsRecyclerViewAdapter.ViewHolder>() {
+class ShoppingListsRecyclerViewAdapter(private var shoppingLists: List<DocumentRevision>) : RecyclerView.Adapter<ShoppingListsRecyclerViewAdapter.ViewHolder>() {
 
     class ViewHolder(card: View) : RecyclerView.ViewHolder(card) {
 
+        val context: Context = card.context
         val toolbar: Toolbar = card.findViewById(R.id.shopping_lists_card_toolbar)
 
         init {
@@ -41,7 +42,10 @@ class ShoppingListsRecyclerViewAdapter(private val activity: Activity, private v
         holder?.toolbar?.title = shoppingLists[position].body.asMap()["title"] as String
         holder?.toolbar?.setOnMenuItemClickListener {
             when (it.itemId) {
-                R.id.action_manage -> this.activity.startActivity(Intent(this.activity, ShoppingListManageActivity::class.java))
+                R.id.action_manage -> {
+                    StateManager.activeShoppingList = this.shoppingLists[position]
+                    holder.context.startActivity(Intent(holder.context, ShoppingListManageActivity::class.java))
+                }
                 R.id.action_delete -> {
                     StateManager.shoppingListRepository.delete(this.shoppingLists[position])
                     this.updateShoppingLists()
