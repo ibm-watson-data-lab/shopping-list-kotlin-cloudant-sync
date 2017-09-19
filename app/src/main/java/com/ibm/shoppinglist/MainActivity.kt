@@ -10,14 +10,17 @@ import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
+import com.cloudant.sync.documentstore.DocumentRevision
 import com.ibm.shoppinglist.view.ShoppingListsRecyclerViewAdapter
 import com.cloudant.sync.documentstore.DocumentStore
 import com.ibm.shoppinglist.model.ShoppingListRepository
 import java.io.File
+import kotlin.concurrent.thread
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), SyncListener {
 
-    lateinit var shoppingListsAdapter: ShoppingListsRecyclerViewAdapter
+    private lateinit var shoppingListsAdapter: ShoppingListsRecyclerViewAdapter
+    var runSync = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,7 +34,7 @@ class MainActivity : AppCompatActivity() {
         StateManager.shoppingListRepository = ShoppingListRepository(documentStore)
 
         // Load the shopping lists
-        this.shoppingListsAdapter = ShoppingListsRecyclerViewAdapter(StateManager.shoppingListRepository.find())
+        this.shoppingListsAdapter = ShoppingListsRecyclerViewAdapter(this, StateManager.shoppingListRepository.find())
 
         // Initialize RecyclerView
         val recyclerView = findViewById(R.id.shopping_lists_recycler_view) as RecyclerView
@@ -43,10 +46,33 @@ class MainActivity : AppCompatActivity() {
         fab.setOnClickListener { _ -> startActivity(Intent(this, ShoppingListAddActivity::class.java)) }
     }
 
+    override fun onSyncComplete() {
+        this.runOnUiThread {
+            this.shoppingListsAdapter.updateShoppingLists()
+        }
+    }
+
+    fun manageShoppingList(shoppingList: DocumentRevision) {
+        StateManager.activeShoppingList = shoppingList
+        this.startActivity(Intent(this, ShoppingListManageActivity::class.java))
+    }
+
+    fun deleteShoppingList(shoppingList: DocumentRevision) {
+        StateManager.shoppingListRepository.delete(shoppingList)
+        this.shoppingListsAdapter.updateShoppingLists()
+    }
 
     public override fun onResume() {  // After a pause OR at startup
         super.onResume()
+        StateManager.activeShoppingList = null
         this.shoppingListsAdapter.updateShoppingLists()
+        SyncManager.syncListener = this
+        SyncManager.startSync()
+    }
+
+    public override fun onDestroy() {
+        super.onDestroy()
+        SyncManager.stopSync()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

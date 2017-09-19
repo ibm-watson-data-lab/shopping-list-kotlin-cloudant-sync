@@ -1,22 +1,19 @@
 package com.ibm.shoppinglist.view
 
-import android.content.Context
-import android.content.Intent
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.cloudant.sync.documentstore.DocumentRevision
+import com.ibm.shoppinglist.MainActivity
 import com.ibm.shoppinglist.R
-import com.ibm.shoppinglist.ShoppingListManageActivity
 import com.ibm.shoppinglist.StateManager
 
-class ShoppingListsRecyclerViewAdapter(private var shoppingLists: List<DocumentRevision>) : RecyclerView.Adapter<ShoppingListsRecyclerViewAdapter.ViewHolder>() {
+class ShoppingListsRecyclerViewAdapter(private val parent: MainActivity, private var shoppingLists: List<DocumentRevision>) : RecyclerView.Adapter<ShoppingListsRecyclerViewAdapter.ViewHolder>() {
 
     class ViewHolder(card: View) : RecyclerView.ViewHolder(card) {
 
-        val context: Context = card.context
         val toolbar: Toolbar = card.findViewById(R.id.shopping_lists_card_toolbar)
 
         init {
@@ -39,16 +36,14 @@ class ShoppingListsRecyclerViewAdapter(private var shoppingLists: List<DocumentR
     }
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
-        holder?.toolbar?.title = shoppingLists[position].body.asMap()["title"] as String
+        holder?.toolbar?.title = shoppingLists[position].body.asMap()["title"].toString()
         holder?.toolbar?.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.action_manage -> {
-                    StateManager.activeShoppingList = this.shoppingLists[position]
-                    holder.context.startActivity(Intent(holder.context, ShoppingListManageActivity::class.java))
+                    this.parent.manageShoppingList(this.shoppingLists[position])
                 }
                 R.id.action_delete -> {
-                    StateManager.shoppingListRepository.delete(this.shoppingLists[position])
-                    this.updateShoppingLists()
+                    this.parent.deleteShoppingList(this.shoppingLists[position])
                 }
             }
             true

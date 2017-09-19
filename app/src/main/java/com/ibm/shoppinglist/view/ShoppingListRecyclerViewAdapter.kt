@@ -23,21 +23,24 @@ class ShoppingListRecyclerViewAdapter(private var shoppingListItems: List<Docume
     }
 
     private fun addItem(title: String) {
-        val item = ShoppingListFactory.newShoppingListItem(title, StateManager.activeShoppingList)
+        val item = ShoppingListFactory.newShoppingListItem(title, StateManager.activeShoppingList!!)
         StateManager.shoppingListRepository.putItem(item)
         this.updateShoppingItemList()
     }
 
-    private fun updateItemChecked(item: DocumentRevision, checked: Boolean) {
+    private fun updateItemChecked(itemIndex: Int, checked: Boolean) {
+        var item = this.shoppingListItems[itemIndex]
         var body = item.body.asMap()
         body["checked"] = checked
         item.body = DocumentBodyFactory.create(body)
-        StateManager.shoppingListRepository.putItem(item)
-//        this.updateShoppingItemList()
+        val newItem = StateManager.shoppingListRepository.putItem(item)
+        val newItems = ArrayList<DocumentRevision>()
+        this.shoppingListItems.indices.mapTo(newItems) { if (it == itemIndex) newItem else this.shoppingListItems[it] }
+        this.shoppingListItems = newItems
     }
 
     fun updateShoppingItemList() {
-        this.shoppingListItems = StateManager.shoppingListRepository.findItems(hashMapOf("type" to "item", "list" to StateManager.activeShoppingList.id))
+        this.shoppingListItems = StateManager.shoppingListRepository.findItems(hashMapOf("type" to "item", "list" to StateManager.activeShoppingList!!.id))
         this.notifyDataSetChanged()
     }
 
@@ -54,7 +57,7 @@ class ShoppingListRecyclerViewAdapter(private var shoppingListItems: List<Docume
             holder?.checkbox?.isEnabled = true
             holder?.checkbox?.isChecked = shoppingListItems[position].body.asMap()["checked"] as Boolean
             holder?.checkbox?.setOnCheckedChangeListener { _, checked ->
-                this.updateItemChecked(this.shoppingListItems[position], checked)
+                this.updateItemChecked(position, checked)
             }
             holder?.textView?.visibility = View.VISIBLE
             holder?.textView?.text = shoppingListItems[position].body.asMap()["title"] as String

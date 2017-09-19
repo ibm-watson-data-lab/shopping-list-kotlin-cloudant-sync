@@ -8,6 +8,6 @@ class StateManager {
     companion object{
 
         lateinit var shoppingListRepository: ShoppingListRepository
-        lateinit var activeShoppingList: DocumentRevision
+        var activeShoppingList: DocumentRevision? = null
     }
 }

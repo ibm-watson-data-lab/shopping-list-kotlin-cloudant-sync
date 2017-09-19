@@ -6,7 +6,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import com.ibm.shoppinglist.view.ShoppingListRecyclerViewAdapter
 
-class ShoppingListManageActivity : AppCompatActivity() {
+class ShoppingListManageActivity : AppCompatActivity(), SyncListener {
 
     private lateinit var shoppingListAdapter : ShoppingListRecyclerViewAdapter
 
@@ -26,5 +26,16 @@ class ShoppingListManageActivity : AppCompatActivity() {
     public override fun onResume() {
         super.onResume()
         this.shoppingListAdapter.updateShoppingItemList()
+        SyncManager.syncListener = this
+    }
+
+    override fun onSyncComplete() {
+        this.runOnUiThread {
+            val shoppingLists = StateManager.shoppingListRepository.find(hashMapOf("_id" to StateManager.activeShoppingList!!.id))
+            if (shoppingLists.isNotEmpty()) {
+                StateManager.activeShoppingList = shoppingLists[0]
+                this.shoppingListAdapter.updateShoppingItemList()
+            }
+        }
     }
 }
