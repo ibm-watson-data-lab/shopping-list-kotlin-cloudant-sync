@@ -52,20 +52,26 @@ class ShoppingListRepository(private val ds: DocumentStore) {
         val shoppingLists = ArrayList<DocumentRevision>()
         var q = query
         if (q == null) {
-            q = HashMap()
-            q.put("type", "list")
+            q = hashMapOf("type" to "list")
         }
         val result = this.ds.query().find(q)
         shoppingLists += result
         return shoppingLists
     }
 
+    fun findItems(shoppingList: DocumentRevision) : List<DocumentRevision> {
+        val shoppingListItems = ArrayList<DocumentRevision>()
+        val q = hashMapOf<String,Any>("type" to "item","list" to shoppingList.id)
+        val result = this.ds.query().find(q)
+        shoppingListItems += result
+        return shoppingListItems
+    }
+
     fun findItems(query: HashMap<String, Any>? = null) : List<DocumentRevision> {
         val shoppingListItems = ArrayList<DocumentRevision>()
         var q = query
         if (q == null) {
-            q = HashMap()
-            q.put("type", "item")
+            q = hashMapOf("type" to "item")
         }
         val result = this.ds.query().find(q)
         shoppingListItems += result
@@ -96,6 +102,12 @@ class ShoppingListRepository(private val ds: DocumentStore) {
 
     fun delete(shoppingList: DocumentRevision) : DocumentRevision {
         val rev = this.ds.database().delete(shoppingList)
+        this.sync()
+        return rev
+    }
+
+    fun deleteItem(shoppingListItem: DocumentRevision) : DocumentRevision {
+        val rev = this.ds.database().delete(shoppingListItem)
         this.sync()
         return rev
     }

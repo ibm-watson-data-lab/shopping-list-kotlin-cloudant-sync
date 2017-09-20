@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.TextView
 import com.cloudant.sync.documentstore.DocumentBodyFactory
 import com.cloudant.sync.documentstore.DocumentRevision
@@ -16,10 +17,13 @@ import com.ibm.shoppinglist.model.ShoppingListFactory
 
 class ShoppingListRecyclerViewAdapter(private var shoppingListItems: List<DocumentRevision>) : RecyclerView.Adapter<ShoppingListRecyclerViewAdapter.ViewHolder>() {
 
+    var newItemText: String = ""
+
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val checkbox: CheckBox = view.findViewById(R.id.shopping_list_card_check_box)
         val textView: TextView = view.findViewById(R.id.shopping_list_card_text_view)
         val editText: EditText = view.findViewById(R.id.shopping_list_card_edit_text)
+        val deleteButton: ImageButton = view.findViewById(R.id.shopping_list_card_delete_button)
     }
 
     private fun addItem(title: String) {
@@ -37,10 +41,22 @@ class ShoppingListRecyclerViewAdapter(private var shoppingListItems: List<Docume
         val newItems = ArrayList<DocumentRevision>()
         this.shoppingListItems.indices.mapTo(newItems) { if (it == itemIndex) newItem else this.shoppingListItems[it] }
         this.shoppingListItems = newItems
+        this.notifyItemChanged(itemIndex)
+        this.notifyItemRangeChanged(itemIndex, 1)
+    }
+
+    private fun deleteItem(itemIndex: Int) {
+        var item = this.shoppingListItems[itemIndex]
+        StateManager.shoppingListRepository.deleteItem(item)
+        val newItems = ArrayList<DocumentRevision>()
+        this.shoppingListItems.indices.mapNotNullTo(newItems) { if (it == itemIndex) null else this.shoppingListItems[it] }
+        this.shoppingListItems = newItems
+        this.notifyItemRemoved(itemIndex)
+        this.notifyItemRangeChanged(itemIndex, this.shoppingListItems.size)
     }
 
     fun updateShoppingItemList() {
-        this.shoppingListItems = StateManager.shoppingListRepository.findItems(hashMapOf("type" to "item", "list" to StateManager.activeShoppingList!!.id))
+        this.shoppingListItems = StateManager.shoppingListRepository.findItems(hashMapOf<String,Any>("type" to "item", "list" to StateManager.activeShoppingList!!.id))
         this.notifyDataSetChanged()
     }
 
@@ -53,6 +69,12 @@ class ShoppingListRecyclerViewAdapter(private var shoppingListItems: List<Docume
     }
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
+        // disable all events first
+        // this is particularly important for checkbox
+        // as setting isChecked will trigger
+        holder?.checkbox?.setOnCheckedChangeListener(null)
+        holder?.editText?.setOnKeyListener(null)
+        holder?.deleteButton?.setOnClickListener(null)
         if (position < this.shoppingListItems.size) {
             holder?.checkbox?.isEnabled = true
             holder?.checkbox?.isChecked = shoppingListItems[position].body.asMap()["checked"] as Boolean
@@ -62,24 +84,32 @@ class ShoppingListRecyclerViewAdapter(private var shoppingListItems: List<Docume
             holder?.textView?.visibility = View.VISIBLE
             holder?.textView?.text = shoppingListItems[position].body.asMap()["title"] as String
             holder?.editText?.visibility = View.GONE
-            holder?.editText?.setOnKeyListener(null)
+            holder?.deleteButton?.visibility = View.VISIBLE
+            holder?.deleteButton?.setOnClickListener {
+                this.deleteItem(position)
+            }
         }
         else {
             holder?.checkbox?.isEnabled = false
             holder?.checkbox?.isChecked = false
-            holder?.checkbox?.setOnCheckedChangeListener(null)
             holder?.textView?.visibility = View.GONE
             holder?.editText?.visibility = View.VISIBLE
+            holder?.editText?.setText(this.newItemText)
             holder?.editText?.setOnKeyListener { _, keyCode, event ->
                 if ((event?.action == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
                     if (holder.editText.text.isNotEmpty()) {
                         addItem(holder.editText.text.toString())
                         holder.editText.text.clear()
+                        this.newItemText = ""
                     }
                     true
                 }
+                else {
+                    this.newItemText = holder.editText.text.toString()
+                }
                 false
             }
+            holder?.deleteButton?.visibility = View.INVISIBLE
         }
     }
 

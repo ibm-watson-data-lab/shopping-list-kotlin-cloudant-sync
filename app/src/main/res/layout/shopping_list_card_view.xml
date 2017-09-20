@@ -4,26 +4,37 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_margin="0dp">
+        android:gravity="center_vertical"
+        android:paddingTop="5dp"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp">
     <CheckBox
             android:id="@+id/shopping_list_card_check_box"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_margin="10dp"/>
+            android:layout_height="wrap_content"/>
     <EditText
             android:id="@+id/shopping_list_card_edit_text"
-            android:layout_width="302dp"
-            android:layout_height="match_parent"
+            android:layout_width="262dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginLeft="5dp"
             android:inputType="text"
             android:textSize="16sp"
             android:lines="1"
-            android:maxLines="1"
-            android:layout_marginTop="15dp"/>
+            android:maxLines="1"/>
     <TextView
             android:id="@+id/shopping_list_card_text_view"
-            android:layout_width="302dp"
-            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginLeft="5dp"
             android:inputType="text"
-            android:textSize="16sp"
-            android:layout_marginTop="15dp"/>
+            android:textSize="16sp"/>
+    <ImageButton
+            android:id="@+id/shopping_list_card_delete_button"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginLeft="5dp"
+            android:clickable="true"
+            android:background="@drawable/ic_delete_black_24dp"/>
 </LinearLayout>

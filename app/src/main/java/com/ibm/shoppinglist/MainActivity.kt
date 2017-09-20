@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity(), SyncListener {
         StateManager.shoppingListRepository = ShoppingListRepository(documentStore)
 
         // Load the shopping lists
-        this.shoppingListsAdapter = ShoppingListsRecyclerViewAdapter(this, StateManager.shoppingListRepository.find())
+        this.shoppingListsAdapter = ShoppingListsRecyclerViewAdapter(this)
 
         // Initialize RecyclerView
         val recyclerView = findViewById(R.id.shopping_lists_recycler_view) as RecyclerView
