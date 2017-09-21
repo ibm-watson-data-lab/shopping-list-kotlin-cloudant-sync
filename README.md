@@ -17,7 +17,24 @@ Shopping List is an Offline First demo [Progressive Web App | hybrid mobile app 
 
 `git clone https://github.com/ibm-watson-data-lab/shopping-list-kotlin-cloudant-sync`
 
-3. In Android Studio choose `File` -> `New` -> `Import Project...` OR `Import Project 'Use auto-import'
-4. Select the _build.gradle_ file in _shopping-list-kotlin-cloudant-sync_
+3. In Android Studio choose **_File_** -> **_New_** -> **_Import Project..._** (if running IntelliJ IDEA choose **_Project from Existing Sources_**)
+4. Select the **_shopping-list-kotlin-cloudant-sync_** folder
 5. Create and start an AVD (or a 3rd party emulator like [Genymotion](https://www.genymotion.com/))
 6. Run the app from Android Studio
+
+## Troubleshooting
+
+If a build configuration is not created for you automatically (typically the case in IntelliJ IDEA) create a new build configuration:
+
+1. Click **_Edit Configurations_** > **_+_** > **_Android App_**
+2. Specify a name
+3. Choose the **_app_** module 
+4. Click **_OK_**
+
+
+If you are having trouble building the project you may need to create a local.properties file:
+
+1. Create a new file called local.properties in the root of the project
+2. Add the following line to the file (substitute with your Android SDK directory)
+
+`sdk.dir=/Users/me/dev/android-sdk-macosx`
