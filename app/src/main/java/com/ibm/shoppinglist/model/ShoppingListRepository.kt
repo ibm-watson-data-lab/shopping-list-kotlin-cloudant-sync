@@ -13,7 +13,6 @@ import com.ibm.shoppinglist.SyncManager
 import java.text.SimpleDateFormat
 import java.util.*
 
-
 class ShoppingListRepository(private val ds: DocumentStore) {
 
     //val remoteDb = "http://admin:pass@192.168.1.70:35984/shopping-list"
@@ -86,19 +85,19 @@ class ShoppingListRepository(private val ds: DocumentStore) {
 
     fun put(shoppingList: DocumentRevision) : DocumentRevision {
         val rev = if (shoppingList.revision == null) {
-            // TODO: should treat incoming shoppingList as immutable, i.e. clone
+            // copy shopping list and update the dates
             val body = shoppingList.body.asMap()
             body["createdAt"] = this.getDateISOString(Date())
             body["updatedAt"] = this.getDateISOString(Date())
-            shoppingList.body = DocumentBodyFactory.create(body)
-            this.ds.database().create(shoppingList)
+            val shoppingListCopy = DocumentRevision(shoppingList.id, shoppingList.revision, DocumentBodyFactory.create(body))
+            this.ds.database().create(shoppingListCopy)
         }
         else {
-            // TODO: should treat incoming shoppingList as immutable, i.e. clone
+            // copy shopping list and update the dates
             val body = shoppingList.body.asMap()
             body["updatedAt"] = Date()
-            shoppingList.body = DocumentBodyFactory.create(body)
-            this.ds.database().update(shoppingList)
+            val shoppingListCopy = DocumentRevision(shoppingList.id, shoppingList.revision, DocumentBodyFactory.create(body))
+            this.ds.database().update(shoppingListCopy)
         }
         this.sync()
         return rev
@@ -106,19 +105,19 @@ class ShoppingListRepository(private val ds: DocumentStore) {
 
     fun putItem(shoppingListItem: DocumentRevision) : DocumentRevision {
         val rev = if (shoppingListItem.revision == null) {
-            // TODO: should treat incoming shoppingList as immutable, i.e. clone
+            // copy shopping list item and update the dates
             val body = shoppingListItem.body.asMap()
             body["createdAt"] = this.getDateISOString(Date())
             body["updatedAt"] = this.getDateISOString(Date())
-            shoppingListItem.body = DocumentBodyFactory.create(body)
-            this.ds.database().create(shoppingListItem)
+            val shoppingListItemCopy = DocumentRevision(shoppingListItem.id, shoppingListItem.revision, DocumentBodyFactory.create(body))
+            this.ds.database().create(shoppingListItemCopy)
         }
         else {
-            // TODO: should treat incoming shoppingList as immutable, i.e. clone
+            // copy shopping list item and update the dates
             val body = shoppingListItem.body.asMap()
             body["updatedAt"] = Date()
-            shoppingListItem.body = DocumentBodyFactory.create(body)
-            this.ds.database().update(shoppingListItem)
+            val shoppingListItemCopy = DocumentRevision(shoppingListItem.id, shoppingListItem.revision, DocumentBodyFactory.create(body))
+            this.ds.database().update(shoppingListItemCopy)
         }
         this.sync()
         return rev
@@ -138,7 +137,7 @@ class ShoppingListRepository(private val ds: DocumentStore) {
 
     private fun getDateISOString(date: Date) : String {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US)
-        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"))
+        dateFormat.timeZone = TimeZone.getTimeZone("UTC")
         return dateFormat.format(date)
     }
 

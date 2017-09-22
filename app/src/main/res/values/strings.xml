@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Shopping List</string>
+    <string name="app_name">Shopping Lists</string>
     <string name="action_settings">Settings</string>
     <string name="action_manage">Manage</string>
     <string name="action_delete">Delete</string>

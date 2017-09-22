@@ -6,23 +6,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
-import com.cloudant.sync.documentstore.DocumentRevision
-import com.ibm.shoppinglist.MainActivity
+import com.ibm.shoppinglist.ShoppingListsActivity
 import com.ibm.shoppinglist.R
 import com.ibm.shoppinglist.StateManager
+import com.ibm.shoppinglist.model.ShoppingListDetails
 
-class ShoppingListsRecyclerViewAdapter(private val parent: MainActivity) : RecyclerView.Adapter<ShoppingListsRecyclerViewAdapter.ViewHolder>() {
+class ShoppingListsRecyclerViewAdapter(private val parent: ShoppingListsActivity) : RecyclerView.Adapter<ShoppingListsRecyclerViewAdapter.ViewHolder>() {
 
-    lateinit var shoppingLists: ArrayList<ShoppingListMeta>
+    var shoppingLists: List<ShoppingListDetails>
 
     init {
-        this.loadShoppingLists()
+        this.shoppingLists = StateManager.datastore.loadLists()
     }
-
-    class ShoppingListMeta(
-            val list: DocumentRevision,
-            val itemCount: Int,
-            val itemCheckedCount: Int)
 
     class ViewHolder(private val adapter: ShoppingListsRecyclerViewAdapter, private val card: View) : RecyclerView.ViewHolder(card) {
 
@@ -37,19 +32,8 @@ class ShoppingListsRecyclerViewAdapter(private val parent: MainActivity) : Recyc
         }
     }
 
-    fun loadShoppingLists() {
-        this.shoppingLists = ArrayList()
-        val lists = StateManager.shoppingListRepository.find()
-        lists.mapTo(this.shoppingLists) {
-            val items = StateManager.shoppingListRepository.findItems(it)
-            val itemCount = items.size
-            val itemCheckedCount = items.count { it.body.asMap()["checked"] as Boolean }
-            ShoppingListMeta(it, itemCount, itemCheckedCount)
-        }
-    }
-
     fun updateShoppingLists() {
-        this.loadShoppingLists()
+        this.shoppingLists = StateManager.datastore.loadLists()
         this.notifyDataSetChanged()
     }
 

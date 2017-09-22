@@ -15,12 +15,10 @@ import com.ibm.shoppinglist.view.ShoppingListsRecyclerViewAdapter
 import com.cloudant.sync.documentstore.DocumentStore
 import com.ibm.shoppinglist.model.ShoppingListRepository
 import java.io.File
-import kotlin.concurrent.thread
 
-class MainActivity : AppCompatActivity(), SyncListener {
+class ShoppingListsActivity : AppCompatActivity(), SyncListener {
 
     private lateinit var shoppingListsAdapter: ShoppingListsRecyclerViewAdapter
-    var runSync = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,7 +29,7 @@ class MainActivity : AppCompatActivity(), SyncListener {
         // Initialize the database
         val documentStorePath = applicationContext.getDir("documentstores", Context.MODE_PRIVATE)
         val documentStore = DocumentStore.getInstance(File(documentStorePath, "shopping-list"))
-        StateManager.shoppingListRepository = ShoppingListRepository(documentStore)
+        StateManager.datastore = Datastore(ShoppingListRepository(documentStore))
 
         // Load the shopping lists
         this.shoppingListsAdapter = ShoppingListsRecyclerViewAdapter(this)
@@ -58,7 +56,7 @@ class MainActivity : AppCompatActivity(), SyncListener {
     }
 
     fun deleteShoppingList(shoppingList: DocumentRevision) {
-        StateManager.shoppingListRepository.delete(shoppingList)
+        StateManager.datastore.deleteList(shoppingList)
         this.shoppingListsAdapter.updateShoppingLists()
     }
 

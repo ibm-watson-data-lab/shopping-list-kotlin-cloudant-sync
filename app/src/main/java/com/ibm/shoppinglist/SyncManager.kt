@@ -13,7 +13,7 @@ class SyncManager {
             this.running = true
             thread {
                 while(this.running) {
-                    StateManager.shoppingListRepository.sync()
+                    StateManager.datastore.shoppingListRepository.sync()
                     Thread.sleep(2000)
                 }
             }

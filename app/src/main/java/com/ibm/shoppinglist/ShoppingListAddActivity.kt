@@ -6,7 +6,6 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.View
 import android.widget.EditText
-import com.ibm.shoppinglist.model.ShoppingListFactory
 
 class ShoppingListAddActivity : AppCompatActivity() {
 
@@ -24,8 +23,7 @@ class ShoppingListAddActivity : AppCompatActivity() {
     }
 
     private fun save(title: String) {
-        val shoppingList = ShoppingListFactory.newShoppingList(title)
-        StateManager.shoppingListRepository.put(shoppingList)
+        StateManager.datastore.addList(title)
         this.finish()
     }
 

@@ -9,11 +9,9 @@ import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
-import com.cloudant.sync.documentstore.DocumentBodyFactory
 import com.cloudant.sync.documentstore.DocumentRevision
 import com.ibm.shoppinglist.R
 import com.ibm.shoppinglist.StateManager
-import com.ibm.shoppinglist.model.ShoppingListFactory
 
 class ShoppingListRecyclerViewAdapter(private var shoppingListItems: List<DocumentRevision>) : RecyclerView.Adapter<ShoppingListRecyclerViewAdapter.ViewHolder>() {
 
@@ -27,17 +25,12 @@ class ShoppingListRecyclerViewAdapter(private var shoppingListItems: List<Docume
     }
 
     private fun addItem(title: String) {
-        val item = ShoppingListFactory.newShoppingListItem(title, StateManager.activeShoppingList!!)
-        StateManager.shoppingListRepository.putItem(item)
+        StateManager.datastore.addItem(title)
         this.updateShoppingItemList()
     }
 
     private fun updateItemChecked(itemIndex: Int, checked: Boolean) {
-        var item = this.shoppingListItems[itemIndex]
-        var body = item.body.asMap()
-        body["checked"] = checked
-        item.body = DocumentBodyFactory.create(body)
-        val newItem = StateManager.shoppingListRepository.putItem(item)
+        val newItem = StateManager.datastore.updateItemChecked(this.shoppingListItems[itemIndex], checked)
         val newItems = ArrayList<DocumentRevision>()
         this.shoppingListItems.indices.mapTo(newItems) { if (it == itemIndex) newItem else this.shoppingListItems[it] }
         this.shoppingListItems = newItems
@@ -46,8 +39,7 @@ class ShoppingListRecyclerViewAdapter(private var shoppingListItems: List<Docume
     }
 
     private fun deleteItem(itemIndex: Int) {
-        var item = this.shoppingListItems[itemIndex]
-        StateManager.shoppingListRepository.deleteItem(item)
+        StateManager.datastore.deleteItem(this.shoppingListItems[itemIndex])
         val newItems = ArrayList<DocumentRevision>()
         this.shoppingListItems.indices.mapNotNullTo(newItems) { if (it == itemIndex) null else this.shoppingListItems[it] }
         this.shoppingListItems = newItems
@@ -56,7 +48,7 @@ class ShoppingListRecyclerViewAdapter(private var shoppingListItems: List<Docume
     }
 
     fun updateShoppingItemList() {
-        this.shoppingListItems = StateManager.shoppingListRepository.findItems(hashMapOf<String,Any>("type" to "item", "list" to StateManager.activeShoppingList!!.id))
+        this.shoppingListItems = StateManager.datastore.loadItems(StateManager.activeShoppingList!!)
         this.notifyDataSetChanged()
     }
 

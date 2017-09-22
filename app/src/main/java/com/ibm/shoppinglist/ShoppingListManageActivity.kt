@@ -15,7 +15,7 @@ class ShoppingListManageActivity : AppCompatActivity(), SyncListener {
         setContentView(R.layout.activity_shopping_list_manage)
 
         // Load the shopping lists
-        this.shoppingListAdapter = ShoppingListRecyclerViewAdapter(StateManager.shoppingListRepository.findItems())
+        this.shoppingListAdapter = ShoppingListRecyclerViewAdapter(StateManager.datastore.loadItems(StateManager.activeShoppingList!!))
 
         // Initialize RecyclerView
         val recyclerView = findViewById(R.id.shopping_list_recycler_view) as RecyclerView
@@ -31,9 +31,9 @@ class ShoppingListManageActivity : AppCompatActivity(), SyncListener {
 
     override fun onSyncComplete() {
         this.runOnUiThread {
-            val shoppingLists = StateManager.shoppingListRepository.find(hashMapOf("_id" to StateManager.activeShoppingList!!.id))
-            if (shoppingLists.isNotEmpty()) {
-                StateManager.activeShoppingList = shoppingLists[0]
+            val shoppingList = StateManager.datastore.loadList(StateManager.activeShoppingList!!.id)
+            if (shoppingList != null) {
+                StateManager.activeShoppingList = shoppingList
                 this.shoppingListAdapter.updateShoppingItemList()
             }
         }
