@@ -15,8 +15,7 @@ import java.util.*
 
 class ShoppingListRepository(private val ds: DocumentStore) {
 
-    //val remoteDb = "http://admin:pass@192.168.1.70:35984/shopping-list"
-    val remoteDb = "http://admin:pass@9.24.7.248:35984/shopping-list"
+    var syncUrl: String = ""
 
     class Listener(private var repository: ShoppingListRepository, private var replicator: Replicator, private var pull: Boolean = false) {
 
@@ -40,14 +39,20 @@ class ShoppingListRepository(private val ds: DocumentStore) {
     }
 
     fun sync() {
-        val uri = URI(remoteDb)
+        if (this.syncUrl.isEmpty()) {
+            return
+        }
+        val uri = URI(this.syncUrl)
         val replicator = ReplicatorBuilder.push().from(this.ds).to(uri).build()
         replicator.eventBus.register(Listener(this, replicator, false))
         replicator.start()
     }
 
     private fun pull() {
-        val uri = URI(remoteDb)
+        if (this.syncUrl.isEmpty()) {
+            return
+        }
+        val uri = URI(this.syncUrl)
         val replicator = ReplicatorBuilder.pull().from(uri).to(this.ds).build()
         replicator.eventBus.register(Listener(this, replicator, true))
         replicator.start()

@@ -19,6 +19,7 @@ import java.io.File
 class ShoppingListsActivity : AppCompatActivity(), SyncListener {
 
     private lateinit var shoppingListsAdapter: ShoppingListsRecyclerViewAdapter
+    private lateinit var settingsDB: DocumentStore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,8 +29,9 @@ class ShoppingListsActivity : AppCompatActivity(), SyncListener {
 
         // Initialize the database
         val documentStorePath = applicationContext.getDir("documentstores", Context.MODE_PRIVATE)
-        val documentStore = DocumentStore.getInstance(File(documentStorePath, "shopping-list"))
-        StateManager.datastore = Datastore(ShoppingListRepository(documentStore))
+        this.settingsDB = DocumentStore.getInstance(File(documentStorePath, "settings"))
+        val shoppingListsDB = DocumentStore.getInstance(File(documentStorePath, "shopping-list"))
+        StateManager.datastore = Datastore(ShoppingListRepository(shoppingListsDB))
 
         // Load the shopping lists
         this.shoppingListsAdapter = ShoppingListsRecyclerViewAdapter(this)
@@ -65,7 +67,7 @@ class ShoppingListsActivity : AppCompatActivity(), SyncListener {
         StateManager.activeShoppingList = null
         this.shoppingListsAdapter.updateShoppingLists()
         SyncManager.syncListener = this
-        SyncManager.startSync()
+        SyncManager.start(settingsDB)
     }
 
     public override fun onDestroy() {
@@ -84,10 +86,9 @@ class ShoppingListsActivity : AppCompatActivity(), SyncListener {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         val id = item.itemId
-
-
         return if (id == R.id.action_settings) {
-            true
+            this.startActivity(Intent(this, SettingsActivity::class.java))
+            return true
         } else super.onOptionsItemSelected(item)
 
     }

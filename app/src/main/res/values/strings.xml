@@ -4,4 +4,5 @@
     <string name="action_manage">Manage</string>
     <string name="action_delete">Delete</string>
     <string name="title_activity_shopping_list_add">New Shopping List</string>
+    <string name="title_activity_settings">Settings</string>
 </resources>
