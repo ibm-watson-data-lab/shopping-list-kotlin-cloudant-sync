@@ -53,7 +53,6 @@ class SyncManager {
 
         fun updateSyncUrl(syncUrl: String) {
             this.applySyncUrl(syncUrl, true)
-
         }
 
         private fun applySyncUrl(syncUrl: String, updateDB: Boolean = true) {
