@@ -17,6 +17,7 @@ class SyncManager {
         var running = false
 
         fun start(settingsDB: DocumentStore) {
+            this.activeSyncUrl = ""
             this.settingsDB = settingsDB
             try {
                 this.settingsDoc = this.settingsDB!!.database().read("settings")
@@ -57,14 +58,16 @@ class SyncManager {
 
         private fun applySyncUrl(syncUrl: String, updateDB: Boolean = true) {
             if (syncUrl != this.activeSyncUrl) {
-                if (this.settingsDoc == null) {
-                    this.settingsDoc = DocumentRevision("settings")
-                    this.settingsDoc!!.body = DocumentBodyFactory.create(hashMapOf("syncUrl" to syncUrl))
-                    this.settingsDoc = this.settingsDB!!.database().create(this.settingsDoc)
-                }
-                else {
-                    this.settingsDoc!!.body = DocumentBodyFactory.create(hashMapOf("syncUrl" to syncUrl))
-                    this.settingsDoc = this.settingsDB!!.database().update(this.settingsDoc)
+                if (updateDB) {
+                    if (this.settingsDoc == null) {
+                        this.settingsDoc = DocumentRevision("settings")
+                        this.settingsDoc!!.body = DocumentBodyFactory.create(hashMapOf("syncUrl" to syncUrl))
+                        this.settingsDoc = this.settingsDB!!.database().create(this.settingsDoc)
+                    }
+                    else {
+                        this.settingsDoc!!.body = DocumentBodyFactory.create(hashMapOf("syncUrl" to syncUrl))
+                        this.settingsDoc = this.settingsDB!!.database().update(this.settingsDoc)
+                    }
                 }
                 this.activeSyncUrl = syncUrl
                 StateManager.datastore.shoppingListRepository.syncUrl = syncUrl

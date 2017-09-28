@@ -46,8 +46,17 @@ class ShoppingListsRecyclerViewAdapter(private val parent: ShoppingListsActivity
     }
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
+        var itemsString = if (shoppingLists[position].itemCount == 0) {
+            "0 items"
+        }
+        else if (shoppingLists[position].itemCount == 1) {
+            "1 item %schecked.".format(if (shoppingLists[position].itemCheckedCount > 0) "" else "un")
+        }
+        else {
+           "%s of %s items checked.".format(shoppingLists[position].itemCheckedCount,shoppingLists[position].itemCount)
+        }
         holder?.titleTextView?.text = shoppingLists[position].list.body.asMap()["title"].toString()
-        holder?.itemsTextView?.text = "%d of %d item(s) checked.".format(shoppingLists[position].itemCheckedCount, shoppingLists[position].itemCount)
+        holder?.itemsTextView?.text = itemsString
         holder?.deleteButton?.setOnClickListener {
             this.parent.deleteShoppingList(this.shoppingLists[position].list)
         }
