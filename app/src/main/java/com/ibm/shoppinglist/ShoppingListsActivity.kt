@@ -67,7 +67,7 @@ class ShoppingListsActivity : AppCompatActivity(), SyncListener {
         StateManager.activeShoppingList = null
         this.shoppingListsAdapter.updateShoppingLists()
         SyncManager.syncListener = this
-        SyncManager.start(settingsDB)
+        SyncManager.startSync(settingsDB)
     }
 
     public override fun onDestroy() {

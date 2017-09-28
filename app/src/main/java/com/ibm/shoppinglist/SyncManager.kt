@@ -16,7 +16,7 @@ class SyncManager {
         var activeSyncUrl: String = ""
         var running = false
 
-        fun start(settingsDB: DocumentStore) {
+        fun startSync(settingsDB: DocumentStore) {
             this.activeSyncUrl = ""
             this.settingsDB = settingsDB
             try {
@@ -30,7 +30,7 @@ class SyncManager {
             }
         }
 
-        private fun startSync() {
+        private fun start() {
             if (StateManager.datastore.shoppingListRepository.syncUrl.isEmpty()) {
                 this.running = false
                 return
@@ -72,7 +72,7 @@ class SyncManager {
                 this.activeSyncUrl = syncUrl
                 StateManager.datastore.shoppingListRepository.syncUrl = syncUrl
                 if (! this.running) {
-                    this.startSync()
+                    this.start()
                 }
             }
         }
